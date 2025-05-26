@@ -41,7 +41,7 @@ async function submit() {
     alertInfo.value.error = '请填写详情';
     return;
   }
-  if (postJson.app_time == null) {
+  if (postJson.app_time == '') {
     alertInfo.value.error = '请选择预约日期';
     return;
   }
