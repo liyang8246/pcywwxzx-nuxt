@@ -4,6 +4,7 @@ const dateNum = ref(0);
 
 issueNum.value = await $fetch('/api/issue_num');
 dateNum.value = await $fetch('/api/date_num');
+
 </script>
 
 <template>
@@ -20,6 +21,7 @@ dateNum.value = await $fetch('/api/date_num');
         </p>
         <div class="flex flex-wrap">
           <NuxtLink to="/booking" class="btn btn-primary btn-soft mr-4 mb-4"> 预约维修 </NuxtLink>
+          <a href="/_nuxt/assets/wxCode.jpg" target="_blank" class="btn btn-outline btn-primary mr-4 mb-4"> 加入我们 </a>
           <div class="join">
             <a href="https://qm.qq.com/q/flBStssyFa" class="btn btn-soft join-item" target="_blank"> QQ咨询群 </a>
             <a href="https://doc.pcywwxzx.top" class="btn btn-soft join-item" target="_blank"> 维修文档 </a>
