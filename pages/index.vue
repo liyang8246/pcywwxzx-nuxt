@@ -2,9 +2,11 @@
 const issueNum = ref(0);
 const dateNum = ref(0);
 
-issueNum.value = await $fetch('/api/issue_num');
-dateNum.value = await $fetch('/api/date_num');
+const res1 = await $fetch('/api/issue_num');
+issueNum.value = typeof res1 === 'number' ? res1 : 0;
 
+const res2 = await $fetch('/api/date_num');
+dateNum.value = typeof res2 === 'number' ? res2 : 0;
 </script>
 
 <template>

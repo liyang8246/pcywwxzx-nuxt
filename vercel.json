@@ -1,0 +1,5 @@
+{
+  "buildCommand": "prisma generate && nuxt build",
+  "outputDirectory": ".output",
+  "framework": "nuxtjs"
+}

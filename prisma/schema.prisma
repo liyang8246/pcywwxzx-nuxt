@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model hub_migrations {
+  id         Int      @id @default(dbgenerated("nextval('_hub_migrations_id_seq'::regclass)"))
+  name       String?  @unique
+  applied_at DateTime @default(now()) @db.Timestamp(6)
+
+  @@map("_hub_migrations")
+}
+
+model Issue {
+  id          Int      @id @default(autoincrement())
+  uid         String
+  name        String
+  class       String
+  phone       String
+  problem     String
+  reg_time    BigInt
+  app_time    BigInt?
+  closed      Boolean
+  closed_time BigInt?
+
+  @@map("issues")
+}

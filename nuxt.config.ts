@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  modules: ['@nuxtjs/tailwindcss', '@nuxthub/core'],
+  modules: ['@nuxtjs/tailwindcss'],
   plugins: ['~/plugins/flyonui.client.ts'],
 
   app: {
@@ -19,16 +19,6 @@ export default defineNuxtConfig({
     manager_passwd: process.env.MANAGER_PASSWD,
     public: {
       backendUrl: process.env.BACKEND_URL,
-    },
-  },
-
-  hub: {
-    database: true,
-  },
-
-  $development: {
-    hub: {
-      remote: 'production',
     },
   },
 });

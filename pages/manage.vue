@@ -3,15 +3,21 @@ const passwd = ref('');
 const issueList = ref([]);
 
 async function getIssueList() {
-  issueList.value = await $fetch('/api/issue_list', {
-    query: { passwd: passwd.value },
-  });
-  issueList.value = issueList.value.map((issue) => {
-    issue.app_time = new Date(Number(issue.app_time) + 8 * 60 * 60000).toISOString();
-    issue.reg_time = new Date(Number(issue.reg_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
-    issue.closed_time = new Date(Number(issue.closed_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
-    return issue;
-  });
+  try {
+    issueList.value = await $fetch('/api/issue_list', {
+      query: { passwd: passwd.value },
+    });
+
+    issueList.value = issueList.value.map((issue) => {
+      issue.app_time = new Date(Number(issue.app_time) + 8 * 60 * 60000).toISOString();
+      issue.reg_time = new Date(Number(issue.reg_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
+      issue.closed_time = new Date(Number(issue.closed_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
+      return issue;
+    });
+  } catch (error) {
+    alert('密码错误或网络错误');
+    issueList.value = [];
+  }
 }
 async function toggleIssue(issueId) {
   await $fetch(`/api/toggle_issue`, {
