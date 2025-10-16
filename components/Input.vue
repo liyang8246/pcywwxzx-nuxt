@@ -29,4 +29,8 @@ const data = ref('');
 watch(data, (newValue) => {
   dateModel.value = newValue;
 });
+
+watch(dateModel, (newValue) => {
+  data.value = newValue || '';
+}, { immediate: true });
 </script>
