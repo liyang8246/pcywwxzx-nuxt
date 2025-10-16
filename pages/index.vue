@@ -21,9 +21,6 @@ dateNum.value = await $fetch('/api/date_num');
         </p>
         <div class="flex flex-wrap">
           <NuxtLink to="/booking" class="btn btn-primary btn-soft mr-4 mb-4"> 预约维修 </NuxtLink>
-          <NuxtLink to="/wxCode.jpg" class="btn btn-outline btn-primary mr-4 mb-4" external>
-             加入我们
-          </NuxtLink>
           <div class="join">
             <a href="https://qm.qq.com/q/flBStssyFa" class="btn btn-soft join-item" target="_blank"> QQ咨询群 </a>
             <a href="https://doc.pcywwxzx.top" class="btn btn-soft join-item" target="_blank"> 维修文档 </a>
