@@ -1,4 +1,8 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite';
+
+const postgresUrl = process.env.POSTGRES_URL || process.env.POSTGRESQL_URL || process.env.DATABASE_URL || '';
+const isRemotePostgres = Boolean(postgresUrl);
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   ssr: false,
@@ -8,27 +12,31 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  modules: ['@nuxtjs/tailwindcss', '@nuxthub/core'],
-  plugins: ['~/plugins/flyonui.client.ts'],
+  modules: ['@nuxthub/core'],
+  css: ['./app/assets/main.css'],
+
+  vite: {
+    plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['flyonui/flyonui'],
+    },
+  },
 
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
   },
 
   runtimeConfig: {
-    manager_passwd: process.env.MANAGER_PASSWD,
+    managerPasswd: '',
     public: {
-      backendUrl: process.env.BACKEND_URL,
+      backendUrl: '',
     },
   },
 
   hub: {
-    database: true,
-  },
-
-  $development: {
-    hub: {
-      remote: 'production',
+    db: {
+      dialect: 'postgresql',
+      driver: isRemotePostgres ? 'neon-http' : 'pglite',
     },
   },
 });
