@@ -1,10 +1,5 @@
 <script setup>
-const issueNum = ref(0);
-const dateNum = ref(0);
-
-issueNum.value = await $fetch('/api/issue_num');
-dateNum.value = await $fetch('/api/date_num');
-
+const stats = await $fetch('/api/issues/stats');
 </script>
 
 <template>
@@ -34,14 +29,14 @@ dateNum.value = await $fetch('/api/date_num');
         <div class="flex space-x-2">
           <h1 class="text-2xl mt-auto font-bold text-base-content">累计维修</h1>
           <h1 class="text-3xl font-bold text-primary w-20 text-center">
-            {{ issueNum }}
+            {{ stats.total }}
           </h1>
           <h1 class="text-2xl mt-auto font-bold text-base-content">次</h1>
         </div>
         <div class="flex space-x-2">
           <h1 class="text-2xl mt-auto font-bold text-base-content">维修时长</h1>
           <h1 class="text-3xl font-bold text-primary w-20 text-center">
-            {{ dateNum }}
+            {{ stats.workdayCount }}
           </h1>
           <h1 class="text-2xl mt-auto font-bold text-base-content">天</h1>
         </div>

@@ -1,7 +1,5 @@
 <script setup>
-
-const initFormData = 
-{
+const initFormData = {
   id: null,
   uid: '',
   name: '',
@@ -12,7 +10,7 @@ const initFormData =
   app_time: '',
   closed: false,
   closed_time: null,
-}
+};
 const formData = ref(initFormData);
 
 const alertInfo = ref({
@@ -59,20 +57,20 @@ async function submit() {
     return;
   }
   loading.value = true;
-  $fetch('/api/new_issue', {
-    method: 'PUT',
-    body: postJson,
-  })
-    .then((response) => {
-      alertInfo.value.info = response;
-      formData.value = {...initFormData};
-    })
-    .catch((error) => {
-      alertInfo.value.error = error.response._data.message;
-    })
-    .finally(() => {
-      loading.value = false;
+
+  try {
+    await $fetch('/api/issues', {
+      method: 'POST',
+      body: postJson,
     });
+    alertInfo.value.info = '预约成功!!!';
+    formData.value = { ...initFormData };
+  } catch (error) {
+    alertInfo.value.error =
+      error?.data?.message || error?.data?.statusMessage || error?.response?._data?.message || '提交失败';
+  } finally {
+    loading.value = false;
+  }
 }
 
 const hasChecked = ref({
@@ -170,7 +168,9 @@ const hasChecked = ref({
             </label>
           </div>
           <button v-show="!hasChecked.comeEarly" class="btn text-sm btn-disabled">提交预约</button>
-          <button @click="submit()" v-show="hasChecked.comeEarly" class="btn text-sm btn-primary" :disabled="loading">{{ loading ? '提交中...' : '提交预约' }}</button>
+          <button @click="submit()" v-show="hasChecked.comeEarly" class="btn text-sm btn-primary" :disabled="loading">
+            {{ loading ? '提交中...' : '提交预约' }}
+          </button>
         </div>
         <div>
           <div v-if="alertInfo.info" class="alert alert-success mt-4" role="alert">
