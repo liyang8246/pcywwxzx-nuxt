@@ -1,5 +1,25 @@
 <script setup>
-const stats = await $fetch('/api/issues/stats');
+function createFallbackStats() {
+  return {
+    total: 0,
+    workdayCount: 0,
+  };
+}
+
+const { data: stats } = await useAsyncData(
+  'issue-stats',
+  async () => {
+    try {
+      return await $fetch('/api/issues/stats');
+    } catch (error) {
+      console.error('Failed to load issue stats', error);
+      return createFallbackStats();
+    }
+  },
+  {
+    default: createFallbackStats,
+  }
+);
 </script>
 
 <template>

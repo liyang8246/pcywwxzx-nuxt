@@ -24,27 +24,27 @@ async function submit() {
   const postJson = formData.value;
   alertInfo.value.error = '';
   alertInfo.value.info = '';
-  if (postJson.name == '') {
+  if (postJson.name === '') {
     alertInfo.value.error = '请填写姓名';
     return;
   }
-  if (postJson.uid == '') {
+  if (postJson.uid === '') {
     alertInfo.value.error = '请填写学号';
     return;
   }
-  if (postJson.phone == '') {
+  if (postJson.phone === '') {
     alertInfo.value.error = '请填写电话';
     return;
   }
-  if (postJson.class == '') {
+  if (postJson.class === '') {
     alertInfo.value.error = '请填写班级';
     return;
   }
-  if (postJson.problem == '') {
+  if (postJson.problem === '') {
     alertInfo.value.error = '请填写详情';
     return;
   }
-  if (postJson.app_time == '') {
+  if (postJson.app_time === '') {
     alertInfo.value.error = '请选择预约日期';
     return;
   }

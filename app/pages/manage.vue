@@ -2,6 +2,7 @@
 const passwd = ref('');
 const issueList = ref([]);
 const authError = ref('');
+const isAuthenticated = ref(false);
 
 function managerHeaders() {
   return {
@@ -20,10 +21,12 @@ async function getIssueList() {
     });
   } catch (error) {
     authError.value = error?.data?.message || error?.data?.statusMessage || error?.statusMessage || '登录失败';
+    isAuthenticated.value = false;
     issueList.value = [];
     return;
   }
 
+  isAuthenticated.value = true;
   issueList.value = issues.map((issue) => {
     issue.app_time = new Date(Number(issue.app_time) + 8 * 60 * 60000).toISOString();
     issue.reg_time = new Date(Number(issue.reg_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
@@ -41,6 +44,12 @@ async function handleManageRequest(action) {
     await action();
   } catch (error) {
     authError.value = error?.data?.message || error?.data?.statusMessage || error?.statusMessage || '操作失败';
+
+    if ((error?.statusCode || error?.data?.statusCode) === 401) {
+      isAuthenticated.value = false;
+      issueList.value = [];
+    }
+
     return false;
   }
 
@@ -81,7 +90,7 @@ async function deleteIssue(issueId) {
 
 <template>
   <div class="min-h-full flex flex-col items-center justify-center">
-    <div class="flex justify-center items-center" v-show="!issueList.length">
+    <div class="flex justify-center items-center" v-show="!isAuthenticated">
       <div class="max-w-sm w-full">
         <div class="join w-full">
           <input type="password" class="input join-item w-full" v-model="passwd" placeholder="PassWord" />
@@ -92,7 +101,7 @@ async function deleteIssue(issueId) {
         </div>
       </div>
     </div>
-    <div class="flex justify-center items-center" v-show="issueList.length">
+    <div class="flex justify-center items-center" v-show="isAuthenticated">
       <div>
         <div v-if="authError" class="alert alert-error mb-3 text-sm">
           {{ authError }}
@@ -114,6 +123,7 @@ async function deleteIssue(issueId) {
               @toggle-issue="toggleIssue(issue)"
               @delete-issue="deleteIssue(issue.id)"
               v-for="issue in issueList"
+              :key="issue.id"
               :issue="issue"
             />
           </tbody>
