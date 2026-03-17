@@ -1,39 +1,24 @@
 import { db, schema } from '@nuxthub/db';
 import { createError } from 'h3';
 
+import { getIssueBookingErrorMessage, issueBookingSchema } from '~~/shared/validation/issue-booking';
+
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const payload = {
-    uid: typeof body?.uid === 'string' ? body.uid.trim() : '',
-    name: typeof body?.name === 'string' ? body.name.trim() : '',
-    class: typeof body?.class === 'string' ? body.class.trim() : '',
-    problem: typeof body?.problem === 'string' ? body.problem.trim() : '',
-    phone: typeof body?.phone === 'string' ? body.phone.trim() : '',
-  };
-  const appTime = Number(body?.app_time);
+  const parseResult = issueBookingSchema.safeParse(await readBody(event));
 
-  if (Object.values(payload).some((value) => !value)) {
+  if (!parseResult.success) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Bad Request',
-      message: '请求参数不完整',
-    });
-  }
-
-  if (!Number.isInteger(appTime) || appTime <= 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'app_time 必须是有效时间戳',
+      message: getIssueBookingErrorMessage(parseResult.error),
     });
   }
 
   const [createdIssue] = await db
     .insert(schema.issues)
     .values({
-      ...payload,
+      ...parseResult.data,
       reg_time: Date.now(),
-      app_time: appTime,
       closed: false,
       closed_time: null,
     })

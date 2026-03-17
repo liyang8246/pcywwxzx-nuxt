@@ -20,6 +20,9 @@ importers:
       drizzle-orm:
         specifier: ^0.44.7
         version: 0.44.7(@cloudflare/workers-types@4.20260313.1)(@electric-sql/pglite@0.3.16)(@libsql/client@0.15.15)(@neondatabase/serverless@1.0.2)(@types/pg@8.18.0)(postgres@3.4.8)
+      drizzle-zod:
+        specifier: ^0.8.3
+        version: 0.8.3(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20260313.1)(@electric-sql/pglite@0.3.16)(@libsql/client@0.15.15)(@neondatabase/serverless@1.0.2)(@types/pg@8.18.0)(postgres@3.4.8))(zod@4.3.6)
       flyonui:
         specifier: ^2.4.1
         version: 2.4.1
@@ -38,6 +41,9 @@ importers:
       vue:
         specifier: 3.5.30
         version: 3.5.30(typescript@5.9.3)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@iconify/json':
         specifier: ^2.2.449
@@ -2794,6 +2800,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.8.3:
+    resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: ^3.25.0 || ^4.0.0
 
   dts-resolver@2.1.3:
     resolution: {integrity: sha512-bihc7jPC90VrosXNzK0LTE2cuLP6jr0Ro8jk+kMugHReJVLIpHz/xadeq3MhuwyO4TD4OA3L1Q8pBBFRc08Tsw==}
@@ -7242,6 +7254,11 @@ snapshots:
       '@neondatabase/serverless': 1.0.2
       '@types/pg': 8.18.0
       postgres: 3.4.8
+
+  drizzle-zod@0.8.3(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20260313.1)(@electric-sql/pglite@0.3.16)(@libsql/client@0.15.15)(@neondatabase/serverless@1.0.2)(@types/pg@8.18.0)(postgres@3.4.8))(zod@4.3.6):
+    dependencies:
+      drizzle-orm: 0.44.7(@cloudflare/workers-types@4.20260313.1)(@electric-sql/pglite@0.3.16)(@libsql/client@0.15.15)(@neondatabase/serverless@1.0.2)(@types/pg@8.18.0)(postgres@3.4.8)
+      zod: 4.3.6
 
   dts-resolver@2.1.3: {}
 

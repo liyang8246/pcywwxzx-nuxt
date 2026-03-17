@@ -1,17 +1,18 @@
 <script setup>
-const initFormData = {
-  id: null,
-  uid: '',
-  name: '',
-  class: '',
-  phone: '',
-  problem: '',
-  reg_time: null,
-  app_time: '',
-  closed: false,
-  closed_time: null,
-};
-const formData = ref(initFormData);
+import { getIssueBookingErrorMessage, issueBookingSchema } from '~~/shared/validation/issue-booking';
+
+function createInitialFormData() {
+  return {
+    uid: '',
+    name: '',
+    class: '',
+    phone: '',
+    problem: '',
+    app_time: '',
+  };
+}
+
+const formData = ref(createInitialFormData());
 
 const alertInfo = ref({
   info: '',
@@ -21,50 +22,24 @@ const alertInfo = ref({
 const loading = ref(false);
 
 async function submit() {
-  const postJson = formData.value;
   alertInfo.value.error = '';
   alertInfo.value.info = '';
-  if (postJson.name === '') {
-    alertInfo.value.error = '请填写姓名';
+  const parseResult = issueBookingSchema.safeParse(formData.value);
+
+  if (!parseResult.success) {
+    alertInfo.value.error = getIssueBookingErrorMessage(parseResult.error);
     return;
   }
-  if (postJson.uid === '') {
-    alertInfo.value.error = '请填写学号';
-    return;
-  }
-  if (postJson.phone === '') {
-    alertInfo.value.error = '请填写电话';
-    return;
-  }
-  if (postJson.class === '') {
-    alertInfo.value.error = '请填写班级';
-    return;
-  }
-  if (postJson.problem === '') {
-    alertInfo.value.error = '请填写详情';
-    return;
-  }
-  if (postJson.app_time === '') {
-    alertInfo.value.error = '请选择预约日期';
-    return;
-  }
-  if (postJson.phone.length != 11) {
-    alertInfo.value.error = '请填写11位电话';
-    return;
-  }
-  if (postJson.uid.length != 11) {
-    alertInfo.value.error = '请填写11位学号';
-    return;
-  }
+
   loading.value = true;
 
   try {
     await $fetch('/api/issues', {
       method: 'POST',
-      body: postJson,
+      body: parseResult.data,
     });
     alertInfo.value.info = '预约成功!!!';
-    formData.value = { ...initFormData };
+    formData.value = createInitialFormData();
   } catch (error) {
     alertInfo.value.error =
       error?.data?.message || error?.data?.statusMessage || error?.response?._data?.message || '提交失败';
