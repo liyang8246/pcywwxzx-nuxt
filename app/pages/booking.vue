@@ -12,6 +12,15 @@ function createInitialFormData() {
   };
 }
 
+function createInitialChecks() {
+  return {
+    userAgreement: false,
+    triedMyself: false,
+    describedInDetail: false,
+    comeEarly: false,
+  };
+}
+
 const formData = ref(createInitialFormData());
 
 const alertInfo = ref({
@@ -20,8 +29,19 @@ const alertInfo = ref({
 });
 
 const loading = ref(false);
+const hasChecked = ref(createInitialChecks());
+const canSubmit = computed(() => {
+  const checks = hasChecked.value;
+
+  return checks.userAgreement && checks.triedMyself && checks.describedInDetail && checks.comeEarly;
+});
 
 async function submit() {
+  if (!canSubmit.value) {
+    alertInfo.value.error = '请完成所有确认后再提交';
+    return;
+  }
+
   alertInfo.value.error = '';
   alertInfo.value.info = '';
   const parseResult = issueBookingSchema.safeParse(formData.value);
@@ -40,6 +60,7 @@ async function submit() {
     });
     alertInfo.value.info = '预约成功!!!';
     formData.value = createInitialFormData();
+    hasChecked.value = createInitialChecks();
   } catch (error) {
     alertInfo.value.error =
       error?.data?.message || error?.data?.statusMessage || error?.response?._data?.message || '提交失败';
@@ -47,13 +68,6 @@ async function submit() {
     loading.value = false;
   }
 }
-
-const hasChecked = ref({
-  userAgreement: false,
-  triedMyself: false,
-  describedInDetail: false,
-  comeEarly: false,
-});
 </script>
 
 <template>
@@ -142,8 +156,8 @@ const hasChecked = ref({
               <div class="my-auto font-medium text-base-content text-sm">我会尽量早来不让工作人员加班</div>
             </label>
           </div>
-          <button v-show="!hasChecked.comeEarly" class="btn text-sm btn-disabled">提交预约</button>
-          <button @click="submit()" v-show="hasChecked.comeEarly" class="btn text-sm btn-primary" :disabled="loading">
+          <button v-show="!canSubmit" class="btn text-sm btn-disabled" disabled>提交预约</button>
+          <button @click="submit()" v-show="canSubmit" class="btn text-sm btn-primary" :disabled="loading">
             {{ loading ? '提交中...' : '提交预约' }}
           </button>
         </div>

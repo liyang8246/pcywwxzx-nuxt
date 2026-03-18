@@ -4,6 +4,28 @@ const issueList = ref([]);
 const authError = ref('');
 const isAuthenticated = ref(false);
 
+function formatIssueDateTime(timestamp, separator = ' ') {
+  if (!timestamp) {
+    return '';
+  }
+
+  const parts = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date(Number(timestamp)));
+  const partMap = Object.fromEntries(
+    parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value])
+  );
+
+  return `${partMap.year}-${partMap.month}-${partMap.day}${separator}${partMap.hour}:${partMap.minute}:${partMap.second}`;
+}
+
 function managerHeaders() {
   return {
     'x-manager-passwd': passwd.value,
@@ -27,14 +49,12 @@ async function getIssueList() {
   }
 
   isAuthenticated.value = true;
-  issueList.value = issues.map((issue) => {
-    issue.app_time = new Date(Number(issue.app_time) + 8 * 60 * 60000).toISOString();
-    issue.reg_time = new Date(Number(issue.reg_time) + 8 * 60 * 60000).toISOString().replace('T', ' ');
-    issue.closed_time = issue.closed_time
-      ? new Date(Number(issue.closed_time) + 8 * 60 * 60000).toISOString().replace('T', ' ')
-      : '';
-    return issue;
-  });
+  issueList.value = issues.map((issue) => ({
+    ...issue,
+    app_time: formatIssueDateTime(issue.app_time, 'T'),
+    reg_time: formatIssueDateTime(issue.reg_time),
+    closed_time: formatIssueDateTime(issue.closed_time),
+  }));
 }
 
 async function handleManageRequest(action) {
@@ -73,6 +93,10 @@ async function toggleIssue(issue) {
 }
 
 async function deleteIssue(issueId) {
+  if (import.meta.client && !window.confirm('确定要删除这条记录吗？')) {
+    return;
+  }
+
   const success = await handleManageRequest(() =>
     $fetch(`/api/issues/${issueId}`, {
       method: 'DELETE',
