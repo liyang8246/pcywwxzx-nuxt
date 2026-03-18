@@ -1,19 +1,27 @@
 <script setup>
+import { getIssueBookingErrorMessage, issueBookingSchema } from '~~/shared/validation/issue-booking';
 
-const initFormData = 
-{
-  id: null,
-  uid: '',
-  name: '',
-  class: '',
-  phone: '',
-  problem: '',
-  reg_time: null,
-  app_time: '',
-  closed: false,
-  closed_time: null,
+function createInitialFormData() {
+  return {
+    uid: '',
+    name: '',
+    class: '',
+    phone: '',
+    problem: '',
+    app_time: '',
+  };
 }
-const formData = ref(initFormData);
+
+function createInitialChecks() {
+  return {
+    userAgreement: false,
+    triedMyself: false,
+    describedInDetail: false,
+    comeEarly: false,
+  };
+}
+
+const formData = ref(createInitialFormData());
 
 const alertInfo = ref({
   info: '',
@@ -21,66 +29,45 @@ const alertInfo = ref({
 });
 
 const loading = ref(false);
+const hasChecked = ref(createInitialChecks());
+const canSubmit = computed(() => {
+  const checks = hasChecked.value;
+
+  return checks.userAgreement && checks.triedMyself && checks.describedInDetail && checks.comeEarly;
+});
 
 async function submit() {
-  const postJson = formData.value;
+  if (!canSubmit.value) {
+    alertInfo.value.error = '请完成所有确认后再提交';
+    return;
+  }
+
   alertInfo.value.error = '';
   alertInfo.value.info = '';
-  if (postJson.name == '') {
-    alertInfo.value.error = '请填写姓名';
-    return;
-  }
-  if (postJson.uid == '') {
-    alertInfo.value.error = '请填写学号';
-    return;
-  }
-  if (postJson.phone == '') {
-    alertInfo.value.error = '请填写电话';
-    return;
-  }
-  if (postJson.class == '') {
-    alertInfo.value.error = '请填写班级';
-    return;
-  }
-  if (postJson.problem == '') {
-    alertInfo.value.error = '请填写详情';
-    return;
-  }
-  if (postJson.app_time == '') {
-    alertInfo.value.error = '请选择预约日期';
-    return;
-  }
-  if (postJson.phone.length != 11) {
-    alertInfo.value.error = '请填写11位电话';
-    return;
-  }
-  if (postJson.uid.length != 11) {
-    alertInfo.value.error = '请填写11位学号';
-    return;
-  }
-  loading.value = true;
-  $fetch('/api/new_issue', {
-    method: 'PUT',
-    body: postJson,
-  })
-    .then((response) => {
-      alertInfo.value.info = response;
-      formData.value = {...initFormData};
-    })
-    .catch((error) => {
-      alertInfo.value.error = error.response._data.message;
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-}
+  const parseResult = issueBookingSchema.safeParse(formData.value);
 
-const hasChecked = ref({
-  userAgreement: false,
-  triedMyself: false,
-  describedInDetail: false,
-  comeEarly: false,
-});
+  if (!parseResult.success) {
+    alertInfo.value.error = getIssueBookingErrorMessage(parseResult.error);
+    return;
+  }
+
+  loading.value = true;
+
+  try {
+    await $fetch('/api/issues', {
+      method: 'POST',
+      body: parseResult.data,
+    });
+    alertInfo.value.info = '预约成功!!!';
+    formData.value = createInitialFormData();
+    hasChecked.value = createInitialChecks();
+  } catch (error) {
+    alertInfo.value.error =
+      error?.data?.message || error?.data?.statusMessage || error?.response?._data?.message || '提交失败';
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -169,8 +156,10 @@ const hasChecked = ref({
               <div class="my-auto font-medium text-base-content text-sm">我会尽量早来不让工作人员加班</div>
             </label>
           </div>
-          <button v-show="!hasChecked.comeEarly" class="btn text-sm btn-disabled">提交预约</button>
-          <button @click="submit()" v-show="hasChecked.comeEarly" class="btn text-sm btn-primary" :disabled="loading">{{ loading ? '提交中...' : '提交预约' }}</button>
+          <button v-show="!canSubmit" class="btn text-sm btn-disabled" disabled>提交预约</button>
+          <button @click="submit()" v-show="canSubmit" class="btn text-sm btn-primary" :disabled="loading">
+            {{ loading ? '提交中...' : '提交预约' }}
+          </button>
         </div>
         <div>
           <div v-if="alertInfo.info" class="alert alert-success mt-4" role="alert">
