@@ -86,7 +86,7 @@ const dateNum = computed(() => stats.value?.days ?? 0)
         <div class="flex items-center gap-x-2">
           <Icon name="lucide:clock" class="flex-none scale-110 text-base-content/40" />
           <p class="text-sm text-base-content">
-            工作日 19:00 - 20:00
+            工作日 20:40 - 21:30
           </p>
         </div>
         <div class="flex items-center gap-x-2">
